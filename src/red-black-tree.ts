@@ -31,9 +31,8 @@ interface ITreeNode<T> {
 
 interface IRedBlackTree<T> {
     insert(value: T): void;
-    remove(index: number): void;
+    remove(value: T): void;
     search(value: T): void;
-    // size: number;
 }
 
 const NULL_NODE: ITreeNode<any> = {
@@ -68,7 +67,7 @@ function insertNode<T>(
     return root;
 }
 
-function fixInsert<T>(tree: ITree<T>, z: ITreeNode<T>, compare: Compare<T>) {
+function fixInsert<T>(tree: ITree<T>, z: ITreeNode<T>) {
     let y: ITreeNode<T>;
     while (y.parent.color === Color.red) {
         if (onLeft(z.parent)) {
@@ -157,6 +156,7 @@ function rotateRight<T>(tree: ITree<T>, x: ITreeNode<T>) {
 性质4：每个红色结点的两个子结点一定都是黑色。
 性质5：任意一结点到每个叶子结点的路径都包含数量相同的黑结点。(如果一个结点存在黑子结点，那么该结点肯定有两个子结点)
 */
+// https://www.cs.usfca.edu/~galles/visualization/RedBlack.html
 
 export function createRedBlackTree<T>(
     compare: Compare<T> = defaultCompare
@@ -167,6 +167,12 @@ export function createRedBlackTree<T>(
     };
 
     return {
+        search(value: T) {
+            let y = tree.root;
+            while (compare(value, y.value) !== 0) {
+
+            }
+        },
         insert: (value: T) => {
             const z: ITreeNode<T> = {
                 parent: NULL_NODE,
@@ -176,8 +182,12 @@ export function createRedBlackTree<T>(
                 value,
             };
             insertNode(tree.root, z, compare);
-            fixInsert(tree, z, compare);
+            fixInsert(tree, z);
             tree.size++;
         },
-    } as IRedBlackTree<T>; // TODO remove 'as'
+        remove(value: T) {
+
+
+        }
+    };
 }
