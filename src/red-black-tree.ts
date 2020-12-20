@@ -71,9 +71,49 @@ function insertNode<T>(
 function fixInsert<T>(tree: ITree<T>, z: ITreeNode<T>, compare: Compare<T>) {
     let y: ITreeNode<T>;
     while (y.parent.color === Color.red) {
-        // TODO
+        if (onLeft(z.parent)) {
+            y = z.parent.parent.right;
+            if (y.color === Color.red) { // 变色
+                z.parent.color = Color.black;
+                y.color = Color.black;
+                z.parent.parent.color = Color.red;
+                z = z.parent.parent;
+            } else {
+                if (!onLeft(z)) {
+                    z = z.parent;
+                    rotateLeft(tree, z);
+                }
+
+                z.parent.color = Color.black;
+                z.parent.parent.color = Color.red;
+                rotateRight(tree, z.parent.parent);
+            }
+        }
+        else {
+            y = z.parent.parent.left;
+
+            if (y.color === Color.red) {
+                z.parent.color = Color.black;
+                y.color = Color.black;
+                z.parent.parent.color = Color.black;
+                z = z.parent.parent;
+            } else {
+                if (onLeft(z)) {
+                    z = z.parent;
+                    rotateRight(tree, z);
+                }
+
+                z.parent.color = Color.black;
+                z.parent.parent.color = Color.red;
+                rotateLeft(tree, z.parent.parent);
+            }
+        }
     }
     tree.root.color = Color.black;
+}
+
+function onLeft<T>(node: ITreeNode<T>) {
+    return node.parent = node.parent.parent.left;
 }
 
 function rotateLeft<T>(tree: ITree<T>, x: ITreeNode<T>) {
@@ -137,6 +177,7 @@ export function createRedBlackTree<T>(
             };
             insertNode(tree.root, z, compare);
             fixInsert(tree, z, compare);
+            tree.size++;
         },
     } as IRedBlackTree<T>; // TODO remove 'as'
 }
