@@ -113,7 +113,7 @@ function fixInsert<T>(tree: ITree<T>, z: ITreeNode<T>, compare: Compare<T>) {
 }
 
 function onLeft<T>(node: ITreeNode<T>) {
-    return node.parent = node.parent.parent.left;
+    return node = node.parent.left;
 }
 
 function rotateLeft<T>(tree: ITree<T>, x: ITreeNode<T>) {
