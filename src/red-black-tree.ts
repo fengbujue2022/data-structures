@@ -32,7 +32,8 @@ interface ITreeNode<T> {
 interface IRedBlackTree<T> {
     insert(value: T): void;
     remove(value: T): void;
-    search(value: T): void;
+    search(value: T): ITreeNode<T>;
+    size: number;
 }
 
 const NULL_NODE: ITreeNode<any> = {
@@ -47,24 +48,72 @@ NULL_NODE.parent = NULL_NODE;
 NULL_NODE.left = NULL_NODE;
 NULL_NODE.right = NULL_NODE;
 
-function insertNode<T>(
-    root: ITreeNode<T>,
-    z: ITreeNode<T>,
-    compare: Compare<T>
-) {
-    if (root === NULL_NODE) {
-        root = z;
-        return root;
+function findNode<T>(tree: ITree<T>, value: T, compare: Compare<T>) {
+    const stack = [tree.root];
+    let ret = NULL_NODE;
+    while (stack.length !== 0) {
+        const node = stack.pop();
+        if (node === NULL_NODE) {
+            continue;
+        }
+        const compareResult = compare(node.value, value);
+        if (compareResult === 0) {
+            ret = node;
+            break;
+        } else if (compareResult > 0 && node.left !== NULL_NODE) {
+            stack.push(node.left);
+        } else if (node.right !== NULL_NODE) {
+            stack.push(node.right);
+        }
     }
-    const compareResult = compare(root.value, z.value);
-    if (compareResult > 0) {
-        root.left = insertNode(root.left, z, compare);
-        root.left.parent = root;
-    } else {
-        root.right = insertNode(root.left, z, compare);
-        root.right.parent = root;
+    return ret;
+}
+
+function onLeft<T>(node: ITreeNode<T>) {
+    return (node = node.parent.left);
+}
+
+function onRight<T>(node: ITreeNode<T>) {
+    return (node = node.parent.right);
+}
+
+function rotateLeft<T>(tree: ITree<T>, x: ITreeNode<T>) {
+    if (x.right === NULL_NODE) return;
+    const y = x.right;
+    x.right = y.left;
+    if (y.left !== NULL_NODE) y.left.parent = x;
+    y.parent = x.parent;
+
+    if (x.parent === NULL_NODE) tree.root = y;
+    else {
+        if (onLeft(x)) x.parent.left = y;
+        else x.parent.right = y;
     }
-    return root;
+
+    y.left = x;
+    x.parent = y;
+}
+
+function rotateRight<T>(tree: ITree<T>, x: ITreeNode<T>) {
+    if (x.left === NULL_NODE) return;
+    const y = x.left;
+    x.left = y.right;
+    if (y.right !== NULL_NODE) y.right.parent = x;
+    y.parent = x.parent;
+
+    if (x.parent === NULL_NODE) tree.root = y;
+    else {
+        if (onRight(x)) x.parent.right = y;
+        else x.parent.left = y;
+    }
+
+    y.right = x;
+    x.parent = y;
+}
+
+function minimumTree<T>(x: ITreeNode<T>) {
+    while (x.left !== NULL_NODE) x = x.left;
+    return x;
 }
 
 function fixInsert<T>(tree: ITree<T>, z: ITreeNode<T>) {
@@ -72,13 +121,14 @@ function fixInsert<T>(tree: ITree<T>, z: ITreeNode<T>) {
     while (y.parent.color === Color.red) {
         if (onLeft(z.parent)) {
             y = z.parent.parent.right;
-            if (y.color === Color.red) { // 变色
+            if (y.color === Color.red) {
+                // filp color
                 z.parent.color = Color.black;
                 y.color = Color.black;
                 z.parent.parent.color = Color.red;
                 z = z.parent.parent;
             } else {
-                if (!onLeft(z)) {
+                if (onRight(z)) {
                     z = z.parent;
                     rotateLeft(tree, z);
                 }
@@ -87,8 +137,7 @@ function fixInsert<T>(tree: ITree<T>, z: ITreeNode<T>) {
                 z.parent.parent.color = Color.red;
                 rotateRight(tree, z.parent.parent);
             }
-        }
-        else {
+        } else {
             y = z.parent.parent.left;
 
             if (y.color === Color.red) {
@@ -111,52 +160,12 @@ function fixInsert<T>(tree: ITree<T>, z: ITreeNode<T>) {
     tree.root.color = Color.black;
 }
 
-function onLeft<T>(node: ITreeNode<T>) {
-    return node = node.parent.left;
+function fixRomove<T>(tree: ITree<T>, z: ITreeNode<T>) {
+    //
 }
 
-function rotateLeft<T>(tree: ITree<T>, x: ITreeNode<T>) {
-    if (x.right === NULL_NODE) return;
-    const y = x.right;
-    x.right = y.left;
-    if (y.left !== NULL_NODE) y.left.parent = x;
-    y.parent = x.parent;
-
-    if (x.parent === NULL_NODE) tree.root = y;
-    else {
-        if (x === x.parent.left) x.parent.left = y;
-        else x.parent.right = y;
-    }
-
-    y.left = x;
-    x.parent = y;
-}
-
-function rotateRight<T>(tree: ITree<T>, x: ITreeNode<T>) {
-    if (x.left === NULL_NODE) return;
-    const y = x.left;
-    x.left = y.right;
-    if (y.right !== NULL_NODE) y.right.parent = x;
-    y.parent = x.parent;
-
-    if (x.parent === NULL_NODE) tree.root = y;
-    else {
-        if (x === x.parent.right) x.parent.right = y;
-        else x.parent.left = y;
-    }
-
-    y.right = x;
-    x.parent = y;
-}
-
-/*
-性质1：每个节点要么是黑色，要么是红色。
-性质2：根节点是黑色。
-性质3：每个叶子节点（NIL）是黑色。
-性质4：每个红色结点的两个子结点一定都是黑色。
-性质5：任意一结点到每个叶子结点的路径都包含数量相同的黑结点。(如果一个结点存在黑子结点，那么该结点肯定有两个子结点)
-*/
-// https://www.cs.usfca.edu/~galles/visualization/RedBlack.html
+// [definition](https://www.cs.auckland.ac.nz/software/AlgAnim/red_black.html)
+// [visulization](https://www.cs.usfca.edu/~galles/visualization/RedBlack.html)
 
 export function createRedBlackTree<T>(
     compare: Compare<T> = defaultCompare
@@ -168,26 +177,63 @@ export function createRedBlackTree<T>(
 
     return {
         search(value: T) {
-            let y = tree.root;
-            while (compare(value, y.value) !== 0) {
-
-            }
+            return findNode(tree, value, compare);
         },
         insert: (value: T) => {
+            let x = tree.root;
+            let y = NULL_NODE;
             const z: ITreeNode<T> = {
                 parent: NULL_NODE,
                 right: NULL_NODE,
                 left: NULL_NODE,
-                color: Color.red, // 因为性质5 避免增加黑色节点，红色节点只需要fix red-red的情况
+                color: Color.red, // red node only need to fix red-red case
                 value,
             };
-            insertNode(tree.root, z, compare);
+
+            while (x !== NULL_NODE) {
+                y = x;
+                if (compare(x.value, z.value) > 0) {
+                    x = x.left;
+                } else {
+                    x = x.right;
+                }
+            }
+
+            if (y === NULL_NODE) {
+                y = z;
+            } else {
+                if (compare(y.value, z.value) > 0) {
+                    y.left = z;
+                } else {
+                    y.right = z;
+                }
+            }
+
             fixInsert(tree, z);
             tree.size++;
         },
         remove(value: T) {
+            const z = findNode(tree, value, compare);
+            let y = z;
+            let originalYColor = y.color;
+            let x: ITreeNode<T>;
+            if (z.left === NULL_NODE) {
+                // TODO
+            } else if (z.right === NULL_NODE) {
+                // TODO
+            } else {
+                // TODO
+                y = minimumTree(z.right);
+                originalYColor = y.color;
+            }
 
-
-        }
+            if (originalYColor === Color.black) {
+                fixRomove(tree, z);
+            }
+            tree.size--;
+        },
+        get size() {
+            return tree.size;
+        },
     };
 }
