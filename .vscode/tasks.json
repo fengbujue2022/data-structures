@@ -1,0 +1,12 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "shell",
+			"command": "yarn",
+			"problemMatcher": [],
+			"label": "build",
+			"detail": "install dependencies from package"
+		}
+	]
+}

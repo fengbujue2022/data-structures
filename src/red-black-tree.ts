@@ -18,7 +18,7 @@ enum Color {
 
 interface ITree<T> {
     root: ITreeNode<T>;
-    size: number;
+    count: number;
 }
 
 interface ITreeNode<T> {
@@ -33,7 +33,7 @@ interface IRedBlackTree<T> {
     insert(value: T): void;
     remove(value: T): void;
     search(value: T): ITreeNode<T>;
-    size: number;
+    count: number;
 }
 
 const NULL_NODE: ITreeNode<any> = {
@@ -172,7 +172,7 @@ export function createRedBlackTree<T>(
 ): IRedBlackTree<T> {
     const tree: ITree<T> = {
         root: NULL_NODE,
-        size: 0,
+        count: 0,
     };
 
     return {
@@ -210,7 +210,7 @@ export function createRedBlackTree<T>(
             }
 
             fixInsert(tree, z);
-            tree.size++;
+            tree.count++;
         },
         remove(value: T) {
             const z = findNode(tree, value, compare);
@@ -230,10 +230,10 @@ export function createRedBlackTree<T>(
             if (originalYColor === Color.black) {
                 fixRomove(tree, z);
             }
-            tree.size--;
+            tree.count--;
         },
-        get size() {
-            return tree.size;
+        get count() {
+            return tree.count;
         },
     };
 }
