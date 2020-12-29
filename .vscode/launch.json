@@ -9,6 +9,7 @@
       "type": "node",
       "request": "launch",
       "cwd": "${workspaceRoot}",
+      "preLaunchTask": "build",
       "protocol": "inspector",
       "program": "${workspaceFolder}/node_modules/jest/bin/jest",
       "outFiles": [
