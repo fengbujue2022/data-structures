@@ -10,7 +10,7 @@ function defaultCompare<T>(a: T, b: T) {
     }
 }
 
-enum Color {
+export enum Color {
     red = 1,
     black = 2,
     nil = 3,
@@ -21,7 +21,7 @@ interface ITree<T> {
     count: number;
 }
 
-interface ITreeNode<T> {
+export interface ITreeNode<T> {
     parent: ITreeNode<T>;
     right: ITreeNode<T>;
     left: ITreeNode<T>;
@@ -29,7 +29,7 @@ interface ITreeNode<T> {
     value: T;
 }
 
-interface IRedBlackTree<T> {
+export interface IRedBlackTree<T> {
     insert(value: T): void;
     remove(value: T): void;
     search(value: T): ITreeNode<T>;
@@ -37,9 +37,9 @@ interface IRedBlackTree<T> {
 }
 
 const NULL_NODE: ITreeNode<any> = {
-    parent: undefined,
-    right: undefined,
-    left: undefined,
+    parent: undefined as any,
+    right: undefined as any,
+    left: undefined as any,
     color: Color.nil,
     value: undefined,
 };
@@ -53,17 +53,19 @@ function findNode<T>(tree: ITree<T>, value: T, compare: Compare<T>) {
     let ret = NULL_NODE;
     while (stack.length !== 0) {
         const node = stack.pop();
-        if (node === NULL_NODE) {
-            continue;
-        }
-        const compareResult = compare(node.value, value);
-        if (compareResult === 0) {
-            ret = node;
-            break;
-        } else if (compareResult > 0 && node.left !== NULL_NODE) {
-            stack.push(node.left);
-        } else if (node.right !== NULL_NODE) {
-            stack.push(node.right);
+        if (node) {
+            if (node === NULL_NODE) {
+                continue;
+            }
+            const compareResult = compare(node.value, value);
+            if (compareResult === 0) {
+                ret = node;
+                break;
+            } else if (compareResult > 0 && node.left !== NULL_NODE) {
+                stack.push(node.left);
+            } else if (node.right !== NULL_NODE) {
+                stack.push(node.right);
+            }
         }
     }
     return ret;
@@ -118,7 +120,7 @@ function minimumTree<T>(x: ITreeNode<T>) {
 
 function fixInsert<T>(tree: ITree<T>, z: ITreeNode<T>) {
     let y: ITreeNode<T>;
-    while (y.parent.color === Color.red) {
+    while (z.parent.color === Color.red) {
         if (onLeft(z.parent)) {
             y = z.parent.parent.right;
             if (y.color === Color.red) {

@@ -3,7 +3,7 @@
     "module": "commonjs",
     "target": "esnext",
     "jsx": "react",
-    "sourceMap": false,
+    "sourceMap": true,
     "experimentalDecorators": true,
     "noImplicitUseStrict": true,
     "removeComments": true,
