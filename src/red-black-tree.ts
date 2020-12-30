@@ -72,11 +72,11 @@ function findNode<T>(tree: ITree<T>, value: T, compare: Compare<T>) {
 }
 
 function onLeft<T>(node: ITreeNode<T>) {
-    return (node = node.parent.left);
+    return node === node.parent.left;
 }
 
 function onRight<T>(node: ITreeNode<T>) {
-    return (node = node.parent.right);
+    return node === node.parent.right;
 }
 
 function rotateLeft<T>(tree: ITree<T>, x: ITreeNode<T>) {
@@ -111,11 +111,6 @@ function rotateRight<T>(tree: ITree<T>, x: ITreeNode<T>) {
 
     y.right = x;
     x.parent = y;
-}
-
-function minimumTree<T>(x: ITreeNode<T>) {
-    while (x.left !== NULL_NODE) x = x.left;
-    return x;
 }
 
 function fixInsert<T>(tree: ITree<T>, z: ITreeNode<T>) {
@@ -162,6 +157,21 @@ function fixInsert<T>(tree: ITree<T>, z: ITreeNode<T>) {
     tree.root.color = Color.black;
 }
 
+function minimumTree<T>(x: ITreeNode<T>) {
+    while (x.left !== NULL_NODE) x = x.left;
+    return x;
+}
+
+function replaceNode<T>(tree: ITree<T>, x: ITreeNode<T>, y: ITreeNode<T>) {
+    if (x.parent === NULL_NODE) tree.root = x;
+    else if (onLeft(x)) {
+        x.parent.left = y;
+    } else {
+        x.parent.right = y;
+    }
+    y.parent = x.parent;
+}
+
 function fixRomove<T>(tree: ITree<T>, z: ITreeNode<T>) {
     //
 }
@@ -184,25 +194,26 @@ export function createRedBlackTree<T>(
         insert: (value: T) => {
             let x = tree.root;
             let y = NULL_NODE;
-            const z: ITreeNode<T> = {
-                parent: NULL_NODE,
-                right: NULL_NODE,
-                left: NULL_NODE,
-                color: Color.red, // red node only need to fix red-red case
-                value,
-            };
 
             while (x !== NULL_NODE) {
                 y = x;
-                if (compare(x.value, z.value) > 0) {
+                if (compare(x.value, value) > 0) {
                     x = x.left;
                 } else {
                     x = x.right;
                 }
             }
 
+            const z: ITreeNode<T> = {
+                parent: y,
+                right: NULL_NODE,
+                left: NULL_NODE,
+                color: Color.red, // red node only need to fix red-red case
+                value,
+            };
+
             if (y === NULL_NODE) {
-                y = z;
+                tree.root = z;
             } else {
                 if (compare(y.value, z.value) > 0) {
                     y.left = z;
@@ -219,14 +230,31 @@ export function createRedBlackTree<T>(
             let y = z;
             let originalYColor = y.color;
             let x: ITreeNode<T>;
+
             if (z.left === NULL_NODE) {
-                // TODO
+                // supplement node even if right node is NULL_NODE
+                x = z.right;
+                replaceNode(tree, z, z.right);
             } else if (z.right === NULL_NODE) {
-                // TODO
+                x = z.left;
+                replaceNode(tree, z, z.left);
             } else {
-                // TODO
                 y = minimumTree(z.right);
                 originalYColor = y.color;
+                x = y.right;
+
+                if (y.parent === z) {
+                    x.parent = y;
+                } else {
+                    replaceNode(tree, y, y.right);
+                    y.right = z.right;
+                    y.right.parent = y;
+                }
+
+                replaceNode(tree, z, y);
+                y.left = z.left;
+                y.left.parent = y;
+                y.color = z.color;
             }
 
             if (originalYColor === Color.black) {

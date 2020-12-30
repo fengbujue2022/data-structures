@@ -2,7 +2,7 @@
 functional data-structures
 
 ### Test
-`npm run test` or `press F5 in vscode`
+`npm run test` or `press F5 in corresponding test file wtih vscode`
 
 ### Resources Reference
 + red-black-tree

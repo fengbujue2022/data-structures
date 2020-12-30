@@ -17,9 +17,6 @@
         "--env=jsdom",
         "${fileBasename}"
       ],
-      "runtimeArgs": [
-        "--inspect-brk"
-      ],
       "console": "integratedTerminal",
       "smartStep": true,
       "sourceMaps": true
