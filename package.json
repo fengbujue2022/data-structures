@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "test": "jest",
-    "test:debug": "node --debug-brk --inspect ./node_modules/jest/bin/jest -i"
+    "test": "jest"
   },
   "repository": {
     "type": "git",

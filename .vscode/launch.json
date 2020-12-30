@@ -5,16 +5,22 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Debug Test",
+      "name": "Jest Debug",
       "type": "node",
       "request": "launch",
       "cwd": "${workspaceRoot}",
-      "preLaunchTask": "build",
+      "preLaunchTask": "restore",
       "protocol": "inspector",
       "program": "${workspaceFolder}/node_modules/jest/bin/jest",
-      "outFiles": [
-        "${workspaceFolder}/debug/**/*.js"
+      "args": [
+        "--runInBand",
+        "--env=jsdom",
+        "${fileBasename}"
       ],
+      "runtimeArgs": [
+        "--inspect-brk"
+      ],
+      "console": "integratedTerminal",
       "smartStep": true,
       "sourceMaps": true
     }

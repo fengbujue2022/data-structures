@@ -5,7 +5,7 @@
 			"type": "shell",
 			"command": "yarn",
 			"problemMatcher": [],
-			"label": "build",
+			"label": "restore",
 			"detail": "install dependencies from package"
 		}
 	]
