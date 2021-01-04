@@ -1,11 +1,11 @@
 # data-structures
 functional data-structures
 
-### Test
+# Test
 `npm run test` or `press F5 in corresponding test file wtih vscode`
 
-### red-black-tree
-##### example
+# red-black-tree
+### example
 ```typescript
     const tree = createRedBlackTree<number>()
     tree.insert(1)
@@ -20,7 +20,7 @@ functional data-structures
     }
 ```
 
-##### resources reference
+### resources reference
 * [definition](https://www.cs.auckland.ac.nz/software/AlgAnim/red_black.html)
 * [visulization](https://www.cs.usfca.edu/~galles/visualization/RedBlack.html)
 
