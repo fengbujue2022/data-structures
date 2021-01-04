@@ -16,7 +16,7 @@ functional data-structures
 
     const expectedResultsStack = [2, 1, 4, 3, 5].reverse()
     for (const v of tree) { // pre-order
-        expect(v).toEqual(expectedResultsStack.pop())
+        console.log(v===expectedResultsStack.pop())// true
     }
 ```
 
