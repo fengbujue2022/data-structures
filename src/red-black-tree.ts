@@ -240,6 +240,20 @@ function fixRomove<T>(tree: ITree<T>, x: ITreeNode<T>) {
     x.color = Color.black
 }
 
+// Mixin
+type MixinedCreateTreeFunction<T, TMixin> = (
+    options?: Partial<RBTOptions<T>>
+) => IRedBlackTree<T> & TMixin
+
+export function Mixin<T, TMixin>(
+    createTree: (options?: Partial<RBTOptions<T>>) => IRedBlackTree<T>,
+    mixinFunc: (instance: IRedBlackTree<T>) => TMixin
+): MixinedCreateTreeFunction<T, TMixin> {
+    return (options?: Partial<RBTOptions<T>>) => {
+        const tree = createTree(options)
+        return Object.assign(tree, mixinFunc(tree))
+    }
+}
 // Iterator
 
 function getBinaryTreeIterator<T>(
@@ -411,3 +425,12 @@ export function createRedBlackTree<T>(
         },
     }
 }
+
+export const extendedCreateRedBlackTree = Mixin(
+    createRedBlackTree,
+    <T>(instance: IRedBlackTree<T>) => ({
+        insertFromArray: (values: T[]) => {
+            values.forEach((item) => instance.insert(item))
+        },
+    })
+)

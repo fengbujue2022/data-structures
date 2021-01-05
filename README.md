@@ -7,17 +7,17 @@ functional data-structures
 # red-black-tree
 ### example
 ```typescript
-    const tree = createRedBlackTree<number>()
-    tree.insert(1)
-    tree.insert(2)
-    tree.insert(3)
-    tree.insert(4)
-    tree.insert(5)
+// create
+const x = createRedBlackTree<number>()
 
-    const expectedResultsStack = [2, 1, 4, 3, 5].reverse()
-    for (const v of tree) { // pre-order
-        console.log(v===expectedResultsStack.pop())// true
-    }
+// insert
+const tree = extendedCreateRedBlackTree<number>()
+tree.insertFromArray([1,2,3,4,5])
+
+const expectedResults = [2, 1, 4, 3, 5].reverse()
+for (const value of tree) { // pre-order
+    console.log(value === expectedResults.pop())// true
+}
 ```
 
 ### resources reference
