@@ -34,7 +34,7 @@ export interface ITreeNode<T> {
     value: T
 }
 
-export interface IRedBlackTree<T> extends Iterable<T> {
+export interface IRedBlackTree<T> extends Iterable<ITreeNode<T>> {
     insert(value: T): void
     remove(value: T): void
     search(value: T): ITreeNode<T>
@@ -245,7 +245,7 @@ type MixinedCreateTreeFunction<T, TMixin> = (
     options?: Partial<RBTOptions<T>>
 ) => IRedBlackTree<T> & TMixin
 
-export function Mixin<T, TMixin>(
+export function mixin<T, TMixin>(
     createTree: (options?: Partial<RBTOptions<T>>) => IRedBlackTree<T>,
     mixinFunc: (instance: IRedBlackTree<T>) => TMixin
 ): MixinedCreateTreeFunction<T, TMixin> {
@@ -259,7 +259,7 @@ export function Mixin<T, TMixin>(
 function getBinaryTreeIterator<T>(
     tree: ITree<T>,
     traversalOrder: TraversalOrder
-): Iterator<T> {
+): Iterator<ITreeNode<T>> {
     const stack = [tree.root]
     let nextNode: (current: ITreeNode<T>) => ITreeNode<T> // TODO
     switch (traversalOrder) {
@@ -299,12 +299,12 @@ function getBinaryTreeIterator<T>(
             }
             if (stack.length === 0) {
                 return {
-                    value: current?.value,
+                    value: current,
                     done: true,
                 }
             } else {
                 return {
-                    value: current!.value,
+                    value: current!,
                     done: false,
                 }
             }
@@ -328,9 +328,6 @@ function getDefaultOptions<T>(options?: Partial<RBTOptions<T>>): RBTOptions<T> {
         options
     )
 }
-
-// [definition](https://www.cs.auckland.ac.nz/software/AlgAnim/red_black.html)
-// [visulization](https://www.cs.usfca.edu/~galles/visualization/RedBlack.html)
 
 export function createRedBlackTree<T>(
     options?: Partial<RBTOptions<T>>
@@ -426,11 +423,24 @@ export function createRedBlackTree<T>(
     }
 }
 
-export const extendedCreateRedBlackTree = Mixin(
+export const extendedCreateRedBlackTree = mixin(
     createRedBlackTree,
     <T>(instance: IRedBlackTree<T>) => ({
-        insertFromArray: (values: T[]) => {
+        insertFromArray(values: T[]) {
             values.forEach((item) => instance.insert(item))
+        },
+        toArray() {
+            const nodes = []
+            for (const node of instance) {
+                nodes.push(node)
+            }
+            return nodes
+        },
+        first() {
+            for (const node of instance) {
+                return node
+            }
+            return undefined
         },
     })
 )
