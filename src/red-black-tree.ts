@@ -293,14 +293,14 @@ function makeBinaryTreeIterator<T>(
     } else {
         // post-order TODO
         return function* () {
-            stack = [tree.root.]
+            stack = [tree.root.left]
             while (stack.length > 0) {
                 let current = stack.pop()!
                 while (current.left !== NULL_NODE) {
+                    stack.push(current.parent)
                     if (current.right !== NULL_NODE) {
                         stack.push(current.right)
                     }
-                    stack.push(current)
                     current = current.left
                 }
                 yield current!
