@@ -254,61 +254,58 @@ export function mixin<T, TMixin>(
         return Object.assign(tree, mixinFunc(tree))
     }
 }
-// Iterator
 
-function getBinaryTreeIterator<T>(
+// Iterator
+function makeBinaryTreeIterator<T>(
     tree: ITree<T>,
     traversalOrder: TraversalOrder
-): Iterator<ITreeNode<T>> {
-    const stack = [tree.root]
-    let nextNode: (current: ITreeNode<T>) => ITreeNode<T> // TODO
-    switch (traversalOrder) {
-        case TraversalOrder.preOrder:
-            nextNode = (current) => {
-                return current.left
-            }
-            break
-        case TraversalOrder.inOrder:
-            nextNode = (current) => {
-                return current.left
-            }
-            break
-        case TraversalOrder.postOrder:
-            nextNode = (current) => {
-                return current.left
-            }
-            break
-        default:
-            nextNode = (current) => {
-                return current.left
-            }
-            break
-    }
-
-    return {
-        next() {
-            const current = stack.pop()
-            if (current) {
-                // pre-order
+) {
+    let stack: ITreeNode<T>[]
+    if (traversalOrder === TraversalOrder.preOrder) {
+        return function* () {
+            stack = [tree.root]
+            while (stack.length > 0) {
+                const current = stack.pop()!
                 if (current.right !== NULL_NODE) {
                     stack.push(current.right)
                 }
                 if (current.left !== NULL_NODE) {
                     stack.push(current.left)
                 }
+                yield current!
             }
-            if (stack.length === 0) {
-                return {
-                    value: current,
-                    done: true,
+        }
+    } else if (traversalOrder === TraversalOrder.inOrder) {
+        return function* () {
+            stack = [tree.root.left]
+            while (stack.length > 0) {
+                let current = stack.pop()!
+                while (current.left !== NULL_NODE) {
+                    if (current.right !== NULL_NODE) {
+                        stack.push(current.right)
+                    }
+                    stack.push(current)
+                    current = current.left
                 }
-            } else {
-                return {
-                    value: current!,
-                    done: false,
-                }
+                yield current!
             }
-        },
+        }
+    } else {
+        // post-order TODO
+        return function* () {
+            stack = [tree.root.]
+            while (stack.length > 0) {
+                let current = stack.pop()!
+                while (current.left !== NULL_NODE) {
+                    if (current.right !== NULL_NODE) {
+                        stack.push(current.right)
+                    }
+                    stack.push(current)
+                    current = current.left
+                }
+                yield current!
+            }
+        }
     }
 }
 
@@ -417,9 +414,7 @@ export function createRedBlackTree<T>(
         get count() {
             return tree.count
         },
-        [Symbol.iterator]() {
-            return getBinaryTreeIterator(tree, traversalOrder)
-        },
+        [Symbol.iterator]: makeBinaryTreeIterator(tree, traversalOrder),
     }
 }
 

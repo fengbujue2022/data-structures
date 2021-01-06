@@ -15,6 +15,7 @@ test('insertion', () => {
     const root = tree.first()
     if (root) {
         expect(root.parent.value).toEqual(undefined) // it is expected to be root node
+        expect(root.value).toEqual(2)
         expect(root.color).toEqual(Color.black)
         expect(root.left.value).toEqual(1)
         expect(root.right.value).toEqual(4)
@@ -26,11 +27,25 @@ test('insertion', () => {
 })
 
 test('iteration', () => {
-    const tree = extendedCreateRedBlackTree<number>()
-    tree.insertFromArray([1, 2, 3, 4, 5])
+    // pre-order
+    const preOrderTree = extendedCreateRedBlackTree<number>({
+        traversalOrder: TraversalOrder.preOrder,
+    })
+    preOrderTree.insertFromArray([1, 2, 3, 4, 5])
 
-    const expectedResults = [2, 1, 4, 3, 5].reverse()
-    for (const node of tree) {
+    let expectedResults = [2, 1, 4, 3, 5].reverse()
+    for (const node of preOrderTree) {
+        expect(node.value).toEqual(expectedResults.pop())
+    }
+
+    // in-order
+    const inOrderTree = extendedCreateRedBlackTree<number>({
+        traversalOrder: TraversalOrder.inOrder,
+    })
+    inOrderTree.insertFromArray([1, 2, 3, 4, 5])
+
+    expectedResults = [1, 2, 3, 4, 5].reverse()
+    for (const node of inOrderTree) {
         expect(node.value).toEqual(expectedResults.pop())
     }
 })
