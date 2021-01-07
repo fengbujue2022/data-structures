@@ -145,7 +145,7 @@ function fixInsert<T>(tree: ITree<T>, z: ITreeNode<T>) {
             if (y.color === Color.red) {
                 z.parent.color = Color.black
                 y.color = Color.black
-                z.parent.parent.color = Color.black
+                z.parent.parent.color = Color.red
                 z = z.parent.parent
             } else {
                 if (onLeft(z)) {
@@ -260,10 +260,9 @@ function makeBinaryTreeIterator<T>(
     tree: ITree<T>,
     traversalOrder: TraversalOrder
 ) {
-    let stack: ITreeNode<T>[]
     if (traversalOrder === TraversalOrder.preOrder) {
         return function* () {
-            stack = [tree.root]
+            const stack = [tree.root]
             while (stack.length > 0) {
                 const current = stack.pop()!
                 if (current.right !== NULL_NODE) {
@@ -277,33 +276,37 @@ function makeBinaryTreeIterator<T>(
         }
     } else if (traversalOrder === TraversalOrder.inOrder) {
         return function* () {
-            stack = [tree.root.left]
-            while (stack.length > 0) {
-                let current = stack.pop()!
-                while (current.left !== NULL_NODE) {
-                    if (current.right !== NULL_NODE) {
-                        stack.push(current.right)
-                    }
+            const stack = []
+            let current = tree.root
+            while (stack.length > 0 || current !== NULL_NODE) {
+                if (current !== NULL_NODE) {
                     stack.push(current)
                     current = current.left
+                } else {
+                    current = stack.pop()!
+                    yield current
+                    current = current.right
                 }
-                yield current!
             }
         }
     } else {
-        // post-order TODO
         return function* () {
-            stack = [tree.root.left]
-            while (stack.length > 0) {
-                let current = stack.pop()!
-                while (current.left !== NULL_NODE) {
-                    stack.push(current.parent)
-                    if (current.right !== NULL_NODE) {
-                        stack.push(current.right)
-                    }
-                    current = current.left
+            const stack1 = []
+            const stack2 = []
+            let current = tree.root
+            stack1.push(current)
+            while (stack1.length > 0) {
+                current = stack1.pop()!
+                stack2.push(current)
+                if (current.left !== NULL_NODE) {
+                    stack1.push(current.left)
                 }
-                yield current!
+                if (current.right !== NULL_NODE) {
+                    stack1.push(current.right)
+                }
+            }
+            while (stack2.length > 0) {
+                yield stack2.pop()!
             }
         }
     }
