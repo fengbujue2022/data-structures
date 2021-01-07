@@ -4,6 +4,7 @@ import {
     extendedCreateRedBlackTree,
     ITreeNode,
     TraversalOrder,
+    NULL_NODE
 } from '../src'
 
 const treeConstructArray = [1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -13,7 +14,25 @@ const traversalOrderMaps = new Map([
     [TraversalOrder.postOrder, [1, 3, 2, 5, 7, 9, 8, 6, 4]],
 ])
 
-function validateRBTDefinition<T>(root: ITreeNode<T>) {}
+function validateRBTDefinition<T>(node: ITreeNode<T>) {
+    const leafNodes = []
+    const stack = []
+    while (node !== NULL_NODE || stack.length > 0) {
+        if (node.right === NULL_NODE && node.left === NULL_NODE) {
+            leafNodes.push(node)
+        }
+        else {
+            if (node.right !== NULL_NODE) {
+                stack.push(node.right);
+            }
+            if (node.left !== NULL_NODE) {
+                stack.push(node.left);
+            }
+        }
+        node = stack.pop();
+    }
+    //TODO:  counts leafNodes number of black node in path
+}
 
 test('insert', () => {
     const tree = extendedCreateRedBlackTree<number>({
