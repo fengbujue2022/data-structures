@@ -2,6 +2,7 @@ import {
     Color,
     createRedBlackTree,
     extendedCreateRedBlackTree,
+    ITreeNode,
     TraversalOrder,
 } from '../src'
 
@@ -12,28 +13,28 @@ const traversalOrderMaps = new Map([
     [TraversalOrder.postOrder, [1, 3, 2, 5, 7, 9, 8, 6, 4]],
 ])
 
-test('insertion', () => {
-    // 暂时的测试 捞得不谈（测 就硬测），应该用 遍历二叉树找到连接的节点里黑色节点的数量 比较是否一样（还应该检查是否符合基本二叉树的定义）
+function validateRBTDefinition<T>(root: ITreeNode<T>) {}
+
+test('insert', () => {
     const tree = extendedCreateRedBlackTree<number>({
         traversalOrder: TraversalOrder.preOrder,
     })
-    tree.insertFromArray([1, 2, 3, 4, 5])
-
-    const root = tree.first()
-    if (root) {
-        expect(root.parent.value).toEqual(undefined) // it is expected to be root node
-        expect(root.value).toEqual(2)
-        expect(root.color).toEqual(Color.black)
-        expect(root.left.value).toEqual(1)
-        expect(root.right.value).toEqual(4)
-        expect(root.right.left.value).toEqual(3)
-        expect(root.right.left.color).toEqual(Color.red)
-        expect(root.right.right.value).toEqual(5)
-        expect(root.right.right.color).toEqual(Color.red)
-    }
+    tree.insertFromArray(treeConstructArray)
+    expect(tree.count).toEqual(treeConstructArray.length)
+    validateRBTDefinition(tree.first()!)
 })
 
-test('iteration-preOrder', () => {
+test('remove', () => {
+    const tree = extendedCreateRedBlackTree<number>({
+        traversalOrder: TraversalOrder.preOrder,
+    })
+    tree.insertFromArray(treeConstructArray)
+    tree.remove(9)
+    expect(tree.count).toEqual(treeConstructArray.length - 1)
+    validateRBTDefinition(tree.first()!)
+})
+
+test('iterate-preOrder', () => {
     const tree = extendedCreateRedBlackTree<number>({
         traversalOrder: TraversalOrder.preOrder,
     })
@@ -47,7 +48,7 @@ test('iteration-preOrder', () => {
     }
 })
 
-test('iteration-inOrder', () => {
+test('iterate-inOrder', () => {
     const tree = extendedCreateRedBlackTree<number>({
         traversalOrder: TraversalOrder.inOrder,
     })
@@ -61,7 +62,7 @@ test('iteration-inOrder', () => {
     }
 })
 
-test('iteration-postOrder', () => {
+test('iterate-postOrder', () => {
     const tree = extendedCreateRedBlackTree<number>({
         traversalOrder: TraversalOrder.postOrder,
     })
