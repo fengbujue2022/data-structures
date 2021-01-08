@@ -4,7 +4,7 @@ import {
     extendedCreateRedBlackTree,
     ITreeNode,
     TraversalOrder,
-    NULL_NODE
+    NULL_NODE,
 } from '../src'
 
 const treeConstructArray = [1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -14,32 +14,57 @@ const traversalOrderMaps = new Map([
     [TraversalOrder.postOrder, [1, 3, 2, 5, 7, 9, 8, 6, 4]],
 ])
 
-function validateRBTDefinition<T>(node: ITreeNode<T>) {
+function randomIntFromInterval(min: number, max: number) {
+    return Math.floor(Math.random() * (max - min + 1) + min)
+}
+
+function validateRBTDefinition<T>(root: ITreeNode<T>) {
     const leafNodes = []
-    const stack = []
-    while (node !== NULL_NODE || stack.length > 0) {
-        if (node.right === NULL_NODE && node.left === NULL_NODE) {
-            leafNodes.push(node)
-        }
-        else {
-            if (node.right !== NULL_NODE) {
-                stack.push(node.right);
+    let node = root
+    const stack: ITreeNode<T>[] = [node]
+    while (stack.length > 0) {
+        if (node !== NULL_NODE) {
+            if (node.right === NULL_NODE && node.left === NULL_NODE) {
+                leafNodes.push(node)
+            } else {
+                if (node.right !== NULL_NODE) {
+                    stack.push(node.right)
+                }
+                if (node.left !== NULL_NODE) {
+                    stack.push(node.left)
+                }
             }
-            if (node.left !== NULL_NODE) {
-                stack.push(node.left);
-            }
         }
-        node = stack.pop();
+        node = stack.pop()!
     }
-    //TODO:  counts leafNodes number of black node in path
+
+    let blackNodeNumber: number
+    leafNodes.forEach((leafNode) => {
+        let n = 0
+        while (leafNode !== NULL_NODE) {
+            if (leafNode.color === Color.black) {
+                n++
+            }
+            leafNode = leafNode.parent
+        }
+        if (!blackNodeNumber) {
+            blackNodeNumber = n
+        } else {
+            expect(blackNodeNumber).toEqual(n) // number of black nodes in all paths should be same
+        }
+    })
 }
 
 test('insert', () => {
     const tree = extendedCreateRedBlackTree<number>({
         traversalOrder: TraversalOrder.preOrder,
     })
-    tree.insertFromArray(treeConstructArray)
-    expect(tree.count).toEqual(treeConstructArray.length)
+    const preparedArray = Array(50)
+        .fill(0)
+        .map((x) => randomIntFromInterval(1, 100))
+    tree.insertFromArray(preparedArray)
+    expect(tree.count).toEqual(preparedArray.length)
+    expect(tree.toArray().length).toEqual(preparedArray.length)
     validateRBTDefinition(tree.first()!)
 })
 
@@ -47,9 +72,17 @@ test('remove', () => {
     const tree = extendedCreateRedBlackTree<number>({
         traversalOrder: TraversalOrder.preOrder,
     })
-    tree.insertFromArray(treeConstructArray)
-    tree.remove(9)
-    expect(tree.count).toEqual(treeConstructArray.length - 1)
+    const preparedArray = Array(50)
+        .fill(0)
+        .map((x) => randomIntFromInterval(1, 100))
+    tree.insertFromArray(preparedArray)
+    Array(10)
+        .fill(0)
+        .map((x) => preparedArray.pop()!)
+        .forEach((x) => {
+            tree.remove(x)
+        })
+    expect(tree.count).toEqual(50 - 10)
     validateRBTDefinition(tree.first()!)
 })
 

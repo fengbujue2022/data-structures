@@ -40,7 +40,7 @@ export interface IRedBlackTree<T> extends Iterable<ITreeNode<T>> {
     search(value: T): ITreeNode<T>
     count: number
 }
- 
+
 export const NULL_NODE: ITreeNode<any> = {
     parent: undefined as any,
     right: undefined as any,
